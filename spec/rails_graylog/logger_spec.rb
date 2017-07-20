@@ -38,9 +38,20 @@ describe RailsGraylog::Logger do
       end
     end
 
-    context 'when logging hash data' do
+    context 'when logging hash data including short and full message' do
       it 'calls the graylog notifier' do
         expect(notifier).to receive(:notify!).with(data_hash.merge(severity: 'INFO'))
+        subject.info(data_hash)
+      end
+    end
+
+    context 'when logging hash data without short and full message' do
+      let(:data_hash) { { foo: 'bar' } }
+
+      it 'calls the graylog notifier and composes a customized short and full message' do
+        expect(notifier).to receive(:notify!).with(data_hash.merge(short_message: "#{data_hash.to_json[0...25]}...",
+                                                                   full_message: data_hash.to_json,
+                                                                   severity: 'INFO'))
         subject.info(data_hash)
       end
     end
