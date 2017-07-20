@@ -14,6 +14,13 @@ describe RailsGraylog::Logger do
     end
   end
 
+  describe '#error' do
+    it 'logs a message when a block is passed' do
+      expect(subject).to receive(:log).with('ERROR', message, nil)
+      subject.error { message }
+    end
+  end
+
   describe '#fatal' do
     it 'logs a message' do
       expect(subject).to receive(:log).with('FATAL', message, nil)

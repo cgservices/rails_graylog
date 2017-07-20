@@ -8,27 +8,27 @@ module RailsGraylog
       super name
     end
 
-    def fatal(message = nil, writing_object = nil, &block)
+    def fatal(message = nil, writing_object = nil)
       message = yield if block_given? && message.nil?
       log('FATAL', message, writing_object)
     end
 
-    def error(message = nil, writing_object = nil, &block)
+    def error(message = nil, writing_object = nil)
       message = yield if block_given? && message.nil?
       log('ERROR', message, writing_object)
     end
 
-    def warn(message = nil, writing_object = nil, &block)
+    def warn(message = nil, writing_object = nil)
       message = yield if block_given? && message.nil?
       log('WARN', message, writing_object)
     end
 
-    def info(message = nil, writing_object = nil, &block)
+    def info(message = nil, writing_object = nil)
       message = yield if block_given? && message.nil?
       log('INFO', message, writing_object)
     end
 
-    def debug(message = nil, writing_object = nil, &block)
+    def debug(message = nil, writing_object = nil)
       message = yield if block_given? && message.nil?
       log('DEBUG', message, writing_object)
     end
