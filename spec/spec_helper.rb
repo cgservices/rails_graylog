@@ -1,3 +1,13 @@
+require 'simplecov'
+require 'simplecov-rcov'
+
+SimpleCov.formatters = [
+  SimpleCov::Formatter::RcovFormatter,
+  SimpleCov::Formatter::HTMLFormatter
+]
+
+SimpleCov.start
+
 require 'bundler/setup'
 require 'rails_graylog'
 require 'ostruct'

@@ -1,41 +1,57 @@
+require 'logger'
+require 'rails_graylog/notifier'
+
 module RailsGraylog
-  class Logger # < ::Logger
-    def fatal(message = nil, writing_object = nil)
-      log(message, writing_object)
+  class Logger < ::Logger
+    def initialize(name, notifier = nil)
+      @notifier = notifier || Notifier.new
+      super name
     end
 
-    def error(message = nil, writing_object = nil)
-      log(message, writing_object)
+    def fatal(message, writing_object = nil)
+      log('FATAL', message, writing_object)
     end
 
-    def warn(message = nil, writing_object = nil)
-      log(message, writing_object)
+    def error(message, writing_object = nil)
+      log('ERROR', message, writing_object)
     end
 
-    def info(message = nil, writing_object = nil)
-      log(message, writing_object)
+    def warn(message, writing_object = nil)
+      log('WARN', message, writing_object)
     end
 
-    def debug(message = nil, writing_object = nil)
-      log(message, writing_object)
+    def info(message, writing_object = nil)
+      log('INFO', message, writing_object)
+    end
+
+    def debug(message, writing_object = nil)
+      log('DEBUG', message, writing_object)
     end
 
     private
 
-    def log(message, writing_object)
+    def log(severity, message = nil, writing_object = nil)
       return if message.nil? || message.empty?
-      save_to_graylog(message, writing_object) if Rails.configuration.graylog_notifier
+      save_to_graylog(severity, message, writing_object) if @notifier
     end
 
-    def save_to_graylog(message, writing_object)
-      params = format_message(message, writing_object)
-      Rails.configuration.graylog_notifier.notify!(params)
+    def save_to_graylog(severity, message, writing_object)
+      params = normalize_message(severity, message, writing_object)
+      @notifier.notify!(params)
     end
 
-    def format_message(message, writing_object)
-      return message if message.is_a?(Hash) && %i[short_message full_message].all? { |key| message.key?(key) }
+    def normalize_message(severity, message, writing_object)
+      if message.is_a?(Hash)
+        raise(ArgumentError, 'short_message and full_message are required logger params.') unless message_hash_valid?(message)
+        return message.merge(severity: severity)
+      end
+
       short_message = writing_object.nil? ? "#{message[0...25]}..." : "#{writing_object.class.name}_#{writing_object.id}"
-      { short_message: short_message, full_message: message }
+      { short_message: short_message, full_message: message, severity: severity }
+    end
+
+    def message_hash_valid?(message_hash)
+      %i[short_message full_message].all? { |key| message_hash.key?(key) }
     end
   end
 end
