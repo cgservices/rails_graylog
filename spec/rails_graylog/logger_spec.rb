@@ -46,7 +46,7 @@ describe RailsGraylog::Logger do
 
     context 'when logging hash data including short and full message' do
       it 'calls the graylog notifier' do
-        expect(notifier).to receive(:notify!).with(data_hash.reject{ |k| k == :writing_object }.merge(severity: 'INFO'))
+        expect(notifier).to receive(:notify!).with(data_hash.reject { |k| k == :writing_object }.merge(severity: 'INFO'))
         subject.info(data_hash)
       end
     end

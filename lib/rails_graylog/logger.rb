@@ -46,7 +46,7 @@ module RailsGraylog
         message[:full_message] = message[:message] if message.key?(:message)
         writing_object = message.key?(:writing_object) ? message[:writing_object] : nil
         message[:short_message] = generate_short_message(message, writing_object) unless message.key?(:short_message)
-        return message.reject{ |k| k == :writing_object }.merge(severity: severity)
+        return message.reject { |k| k == :writing_object }.merge(severity: severity)
       end
 
       short_message = generate_short_message(message)
