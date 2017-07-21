@@ -1,64 +1,60 @@
-require 'logger'
-require 'rails_graylog/notifier'
-
 module RailsGraylog
-  class Logger < ::Logger
-    def initialize(name, notifier = nil)
-      @notifier = notifier || Notifier.new
-      super name
+  class Logger
+    def initialize(notifier = nil)
+      @notifier = notifier || GelfNotifier.new
     end
 
-    def fatal(message = nil, writing_object = nil)
+    def fatal(message = nil)
       message = yield if block_given? && message.nil?
-      log('FATAL', message, writing_object)
+      log('FATAL', message)
     end
 
-    def error(message = nil, writing_object = nil)
+    def error(message = nil)
       message = yield if block_given? && message.nil?
-      log('ERROR', message, writing_object)
+      log('ERROR', message)
     end
 
-    def warn(message = nil, writing_object = nil)
+    def warn(message = nil)
       message = yield if block_given? && message.nil?
-      log('WARN', message, writing_object)
+      log('WARN', message)
     end
 
-    def info(message = nil, writing_object = nil)
+    def info(message = nil)
       message = yield if block_given? && message.nil?
-      log('INFO', message, writing_object)
+      log('INFO', message)
     end
 
-    def debug(message = nil, writing_object = nil)
+    def debug(message = nil)
       message = yield if block_given? && message.nil?
-      log('DEBUG', message, writing_object)
+      log('DEBUG', message)
     end
 
     private
 
-    def log(severity, message = nil, writing_object = nil)
+    def log(severity, message = nil)
       return if message.nil? || message.empty?
-      save_to_graylog(severity, message, writing_object) if @notifier
+      notify_message(severity, message)
     end
 
-    def save_to_graylog(severity, message, writing_object)
-      params = normalize_message(severity, message, writing_object)
+    def notify_message(severity, message)
+      params = normalize_message(severity, message)
       @notifier.notify!(params)
     end
 
-    def normalize_message(severity, message, writing_object)
+    def normalize_message(severity, message)
       if message.is_a?(Hash)
-        json_message = message.to_json
-        message[:full_message] = json_message unless message.key?(:full_message)
-        message[:short_message] = generate_short_message(json_message, writing_object) unless message.key?(:short_message)
-        return message.merge(severity: severity)
+        message[:full_message] = message[:message] if message.key?(:message)
+        writing_object = message.key?(:writing_object) ? message[:writing_object] : nil
+        message[:short_message] = generate_short_message(message, writing_object) unless message.key?(:short_message)
+        return message.reject{ |k| k == :writing_object }.merge(severity: severity)
       end
 
-      short_message = generate_short_message(message, writing_object)
+      short_message = generate_short_message(message)
       { short_message: short_message, full_message: message, severity: severity }
     end
 
-    def generate_short_message(message, writing_object)
-      writing_object.nil? ? "#{message[0...25]}..." : "#{writing_object.class.name}_#{writing_object.id}"
+    def generate_short_message(message, writing_object = nil)
+      writing_object.nil? ? "#{message.to_s[0...25]}..." : "#{writing_object.class.name}_#{writing_object.id}"
     end
   end
 end

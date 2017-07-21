@@ -2,7 +2,7 @@ require 'spec_helper'
 
 class Rails; end # monkey patch
 
-describe RailsGraylog::Notifier do
+describe RailsGraylog::GelfNotifier do
   let(:notifier) { double }
 
   before do

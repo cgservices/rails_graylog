@@ -20,7 +20,7 @@ Or install it yourself as:
 
 ## Usage
 
-Make sure the environment variables GRAYLOG_HOST, GRAYLOG_PORT and GRAYLOG_API_KEY are set correctly.
+Make sure the environment variables GRAYLOG_HOST and GRAYLOG_PORT are set correctly.
 
     require 'rails_graylog'
 
