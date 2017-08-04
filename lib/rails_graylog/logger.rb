@@ -1,7 +1,10 @@
 module RailsGraylog
   class Logger
+    attr_accessor :formatter, :default_formatter, :progname, :level
+
     def initialize(notifier = nil)
       @notifier = notifier || GelfNotifier.new
+      @progname = @level = @formatter = @default_formatter = nil
     end
 
     def fatal(message = nil)
