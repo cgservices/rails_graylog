@@ -1,43 +1,47 @@
+require 'logger'
+
 module RailsGraylog
-  class Logger
+  class Logger < ::Logger
     attr_accessor :formatter, :default_formatter, :progname, :level
+
+    alias add log
 
     def initialize(notifier = nil)
       @notifier = notifier || GelfNotifier.new
       @progname = @level = @formatter = @default_formatter = nil
     end
 
-    def fatal(message = nil)
+    def fatal(message = nil, &_block)
       message = yield if block_given? && message.nil?
       log('FATAL', message)
     end
 
-    def error(message = nil)
+    def error(message = nil, &_block)
       message = yield if block_given? && message.nil?
       log('ERROR', message)
     end
 
-    def warn(message = nil)
+    def warn(message = nil, &_block)
       message = yield if block_given? && message.nil?
       log('WARN', message)
     end
 
-    def info(message = nil)
+    def info(message = nil, &_block)
       message = yield if block_given? && message.nil?
       log('INFO', message)
     end
 
-    def debug(message = nil)
+    def debug(message = nil, &_block)
       message = yield if block_given? && message.nil?
       log('DEBUG', message)
     end
 
-    private
-
-    def log(severity, message = nil)
+    def log(severity, message = nil, _progname = nil, &_block)
       return if message.nil? || message.empty?
       notify_message(severity, message)
     end
+
+    private
 
     def notify_message(severity, message)
       params = normalize_message(severity, message)

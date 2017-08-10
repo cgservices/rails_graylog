@@ -8,6 +8,8 @@ describe RailsGraylog::Logger do
 
   subject { described_class.new(notifier) }
 
+  it { is_expected.to respond_to(:add, :datetime_format, :debug?) }
+
   describe '#initialize' do
     it 'initializes the default notifier' do
       expect(RailsGraylog::GelfNotifier).to receive(:new)
