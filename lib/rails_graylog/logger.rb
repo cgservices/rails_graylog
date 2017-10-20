@@ -8,7 +8,8 @@ module RailsGraylog
 
     def initialize(notifier = nil)
       @notifier = notifier || GelfNotifier.new
-      @progname = @level = @formatter = @default_formatter = nil
+      @progname = @formatter = @default_formatter = nil
+      @level = ::Logger::DEBUG
     end
 
     def fatal(message = nil, &_block)
