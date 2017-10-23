@@ -10,6 +10,10 @@ describe RailsGraylog::Logger do
 
   it { is_expected.to respond_to(:add, :datetime_format, :debug?) }
 
+  before do
+    subject.level = ::Logger::DEBUG
+  end
+
   describe '#initialize' do
     it 'initializes the default notifier' do
       expect(RailsGraylog::GelfNotifier).to receive(:new)
@@ -19,14 +23,14 @@ describe RailsGraylog::Logger do
 
   describe '#error' do
     it 'logs a message when a block is passed' do
-      expect(subject).to receive(:log).with('ERROR', message)
+      expect(subject).to receive(:log).with(::Logger::ERROR, message)
       subject.error { message }
     end
   end
 
   describe '#fatal' do
     it 'logs a message' do
-      expect(subject).to receive(:log).with('FATAL', message)
+      expect(subject).to receive(:log).with(::Logger::FATAL, message)
       subject.fatal(message)
     end
   end
