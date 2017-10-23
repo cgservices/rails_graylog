@@ -38,7 +38,6 @@ module RailsGraylog
     end
 
     def log(severity, message = nil, _progname = nil, &_block)
-      binding.pry
       return if message.nil? || message.empty? || SEV_LABEL.index(severity) < SEV_LABEL.index(level)
       notify_message(severity, message)
     end
