@@ -2,44 +2,43 @@ require 'logger'
 
 module RailsGraylog
   class Logger < ::Logger
-    attr_accessor :formatter, :default_formatter, :progname, :level
+    attr_accessor :formatter, :default_formatter, :progname
 
     alias add log
 
     def initialize(notifier = nil)
       @notifier = notifier || GelfNotifier.new
       @progname = @formatter = @default_formatter = nil
-      @level = ::Logger::DEBUG
     end
 
     def fatal(message = nil, &_block)
       message = yield if block_given? && message.nil?
-      log('FATAL', message)
+      log(::Logger::FATAL, message)
     end
 
     def error(message = nil, &_block)
       message = yield if block_given? && message.nil?
-      log('ERROR', message)
+      log(::Logger::ERROR, message)
     end
 
     def warn(message = nil, &_block)
       message = yield if block_given? && message.nil?
-      log('WARN', message)
+      log(::Logger::WARN, message)
     end
 
     def info(message = nil, &_block)
       message = yield if block_given? && message.nil?
-      log('INFO', message)
+      log(::Logger::INFO, message)
     end
 
     def debug(message = nil, &_block)
       message = yield if block_given? && message.nil?
-      log('DEBUG', message)
+      log(::Logger::DEBUG, message)
     end
 
     def log(severity, message = nil, _progname = nil, &_block)
-      return if message.nil? || message.empty?
-      notify_message(severity, message)
+      return if message.nil? || message.empty? || severity < level
+      notify_message(SEV_LABEL[severity], message)
     end
 
     private
