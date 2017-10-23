@@ -6,10 +6,10 @@ module RailsGraylog
 
     alias add log
 
-    def initialize(notifier = nil)
+    def initialize(notifier = nil, level: 'DEBUG')
       @notifier = notifier || GelfNotifier.new
       @progname = @formatter = @default_formatter = nil
-      @level = ::Logger::DEBUG
+      @level = level
     end
 
     def fatal(message = nil, &_block)
@@ -38,7 +38,8 @@ module RailsGraylog
     end
 
     def log(severity, message = nil, _progname = nil, &_block)
-      return if message.nil? || message.empty?
+      binding.pry
+      return if message.nil? || message.empty? || SEV_LABEL.index(severity) < SEV_LABEL.index(level)
       notify_message(severity, message)
     end
 
