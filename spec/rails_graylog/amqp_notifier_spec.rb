@@ -1,21 +1,25 @@
 require 'spec_helper'
 
 describe RailsGraylog::AmqpNotifier do
-  let(:notifier) { double }
+  let(:channel) { double }
+  let(:queue) { double }
+
+  before do
+    allow(Mq).to receive(:channel).and_return(channel)
+    allow(channel).to receive(:queue).and_return(queue)
+  end
 
   describe '#initialize' do
     it 'initializes the GELF notifier by default' do
-      expect(GELF::Notifier).to receive(:new)
+      expect(channel).to receive(:queue)
       subject
     end
   end
 
   describe '#notify!' do
-    subject { described_class.new(notifier) }
-
     it 'delegates to the notifier instance' do
-      expect(notifier).to receive(:notify!)
-      subject.notify!('')
+      expect(queue).to receive(:publish)
+      subject.notify!({})
     end
   end
 end

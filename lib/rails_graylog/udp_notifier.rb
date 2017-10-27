@@ -7,8 +7,8 @@ module RailsGraylog
 
     def_delegator :@notifier, :notify!
 
-    def initialize
-      @notifier = gelf
+    def initialize(notifier: nil)
+      @notifier = notifier || gelf
     end
 
     private

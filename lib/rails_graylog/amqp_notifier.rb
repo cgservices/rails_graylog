@@ -8,7 +8,7 @@ module RailsGraylog
       @host = host || Socket.gethostname
       @channel = channel || Mq.channel
       raise 'No connection available' unless @channel
-      @queue = channel.queue(queue_name, queue_kwargs)
+      @queue = @channel.queue(queue_name, queue_kwargs)
     end
 
     def notify!(message)
