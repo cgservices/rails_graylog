@@ -2,12 +2,12 @@ require 'gelf'
 require 'forwardable'
 
 module RailsGraylog
-  class GelfNotifier
+  class UDPNotifier
     extend Forwardable
 
     def_delegator :@notifier, :notify!
 
-    def initialize(notifier = nil)
+    def initialize(notifier: nil)
       @notifier = notifier || gelf
     end
 

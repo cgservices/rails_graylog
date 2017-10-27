@@ -1,4 +1,5 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in rails_graylog.gemspec
 gemspec
+
+gem 'mq', tag: '0.4.1', git: 'git@github.com:cgservices/mq.git'

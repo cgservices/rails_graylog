@@ -15,9 +15,8 @@ describe RailsGraylog::Logger do
   end
 
   describe '#initialize' do
-    it 'initializes the default notifier' do
-      expect(RailsGraylog::GelfNotifier).to receive(:new)
-      described_class.new
+    it 'requires a notifier' do
+      expect { described_class.new }.to raise_error(ArgumentError)
     end
   end
 

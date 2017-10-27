@@ -6,8 +6,8 @@ module RailsGraylog
 
     alias add log
 
-    def initialize(notifier = nil)
-      @notifier = notifier || GelfNotifier.new
+    def initialize(notifier)
+      @notifier = notifier
       @progname = @formatter = @default_formatter = nil
     end
 
