@@ -1,14 +1,7 @@
 require 'spec_helper'
 
-class Rails; end # monkey patch
-
-describe RailsGraylog::GelfNotifier do
+describe RailsGraylog::AmqpNotifier do
   let(:notifier) { double }
-
-  before do
-    allow(Rails).to receive(:application).and_return(double)
-    allow(RSpec::Mocks::Double).to receive(:parent_name)
-  end
 
   describe '#initialize' do
     it 'initializes the GELF notifier by default' do
