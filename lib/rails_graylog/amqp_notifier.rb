@@ -1,14 +1,10 @@
-require 'mq'
-
 module RailsGraylog
   class AmqpNotifier
-    attr_reader :queue, :channel, :host
+    attr_reader :queue
 
-    def initialize(channel: nil, queue_name: 'logging', host: nil, **queue_kwargs)
-      @host = host || Socket.gethostname
-      @channel = channel || Mq.channel
-      raise 'No connection available' unless @channel
-      @queue = @channel.queue(queue_name, queue_kwargs)
+    def initialize(channel:, queue_name: 'logging', **queue_args)
+      raise 'No connection available' unless channel
+      @queue = channel.queue(queue_name, queue_args)
     end
 
     def notify!(message)
@@ -18,7 +14,7 @@ module RailsGraylog
     private
 
     def gelf_message
-      { host: host, version: '1.1' }
+      { host: Socket.gethostname, version: '1.1' }
     end
   end
 end
