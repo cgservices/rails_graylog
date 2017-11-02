@@ -65,5 +65,19 @@ describe RailsGraylog::Logger do
         subject.info(data_hash)
       end
     end
+
+    context 'when logging an exception instance' do
+      it 'calls the notifier with the exception backtrace and message' do
+        begin
+          raise 'hello'
+        rescue => e
+          expect(notifier).to receive(:notify!).with(full_message: "Backtrace:\n" + e.backtrace.join("\n"),
+                                                     short_message: 'RuntimeError: hello',
+                                                     severity: 'INFO'
+                                                    )
+          subject.info(e)
+        end
+      end
+    end
   end
 end
