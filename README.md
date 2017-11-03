@@ -24,6 +24,17 @@ Make sure the environment variables GRAYLOG_HOST and GRAYLOG_PORT are set correc
 
     require 'rails_graylog'
 
+In Rails configuration:
+
+```ruby
+exception_handler = Proc.new do |exception|
+  ExceptionNotification.notify_exception(exception)
+end
+
+amqp_notifier = RailsGraylog::AmqpNotifier.new(queue_name: 'logging', channel: Mq.channel, exception_handler: exception_handler, durable: true)
+Rails.config.logger = RailsGraylog::Logger.new(amqp_notifier)
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
