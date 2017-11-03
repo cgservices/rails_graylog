@@ -2,12 +2,13 @@ require 'logger'
 
 module RailsGraylog
   class Logger < ::Logger
-    attr_accessor :formatter, :default_formatter, :progname
+    attr_accessor :formatter, :default_formatter, :progname, :error_handler
 
     alias add log
 
-    def initialize(notifier)
+    def initialize(notifier, error_handler = nil)
       @notifier = notifier
+      @error_handler = error_handler
       @progname = @formatter = @default_formatter = nil
     end
 
@@ -37,7 +38,7 @@ module RailsGraylog
     end
 
     def log(severity, message = nil, _progname = nil, &_block)
-      return if message.nil? || message.empty? || severity < level
+      return if message.nil? || message.to_s.empty? || severity < level
       notify_message(SEV_LABEL[severity], message)
     end
 
@@ -49,19 +50,31 @@ module RailsGraylog
     end
 
     def normalize_message(severity, message)
+      message_hash = { severity: severity }
+
       if message.is_a?(Hash)
         message[:full_message] = message[:message] if message.key?(:message)
         writing_object = message.key?(:writing_object) ? message[:writing_object] : nil
         message[:short_message] = generate_short_message(message, writing_object) unless message.key?(:short_message)
-        return message.reject { |k| k == :writing_object }.merge(severity: severity)
+        message.reject { |k| k == :writing_object }.merge(message_hash)
+      elsif message.is_a?(Exception)
+        extract_hash_from_exception(message).merge(severity: severity)
+      else
+        short_message = generate_short_message(message)
+        message_hash.merge(short_message: short_message, full_message: message.to_s)
       end
-
-      short_message = generate_short_message(message)
-      { short_message: short_message, full_message: message, severity: severity }
     end
 
     def generate_short_message(message, writing_object = nil)
       writing_object.nil? ? "#{message.to_s[0...25]}..." : "#{writing_object.class.name}_#{writing_object.id}"
+    end
+
+    def extract_hash_from_exception(exception)
+      bt = exception.backtrace || ["Backtrace is not available."]
+      {
+        short_message: "#{exception.class}: #{exception.message}",
+        full_message: "Backtrace:\n" + bt.join("\n")
+      }
     end
   end
 end
