@@ -3,7 +3,7 @@ require 'spec_helper'
 describe RailsGraylog::AmqpNotifier do
   let(:channel) { double }
   let(:queue) { double }
-  subject { described_class.new channel: channel }
+  subject { described_class.new(channel: channel, exception_handler: nil) }
 
   before do
     allow(Socket).to receive(:gethostname).and_return('localhost')
