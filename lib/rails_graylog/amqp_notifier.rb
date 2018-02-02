@@ -14,7 +14,9 @@ module RailsGraylog
     private
 
     def gelf_message
-      { host: Socket.gethostname, version: '1.1' }
+      { host: Socket.gethostname,
+        version: '1.1',
+        facility: Rails.application.class.parent_name }
     end
   end
 end
