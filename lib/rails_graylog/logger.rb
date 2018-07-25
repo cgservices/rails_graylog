@@ -66,7 +66,10 @@ module RailsGraylog
     end
 
     def generate_short_message(message, writing_object = nil)
-      writing_object.nil? ? "#{message.to_s[0...25]}..." : "#{writing_object.class.name}_#{writing_object.id}"
+      return message[:short_message] if message.is_a?(Hash) && message.key?(:short_message)
+      m = message.is_a?(Hash) && message.key?(:message) ? message[:message] : message.to_s
+      m = "#{m[0...25]}..." if m.size > 25
+      writing_object.nil? ? m : "#{writing_object.class.name}_#{writing_object.id}"
     end
 
     def extract_hash_from_exception(exception)
