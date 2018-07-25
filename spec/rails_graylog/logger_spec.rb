@@ -37,8 +37,17 @@ describe RailsGraylog::Logger do
   describe '#info' do
     context 'when logging a string message' do
       it 'calls the graylog notifier' do
-        expect(notifier).to receive(:notify!).with(short_message: "#{message[0...25]}...", full_message: message, severity: 'INFO')
+        short_message = "#{message[0...25]}..." if message.size > 25
+        expect(notifier).to receive(:notify!).with(short_message: short_message || message, full_message: message, severity: 'INFO')
         subject.info(message)
+      end
+    end
+
+    context 'when logging a very long string message' do
+      it 'shortens the short_message before calling the graylog_notifier' do
+        long_message = 'this is a very long log message because it needs more than 25 characters'
+        expect(notifier).to receive(:notify!).with(short_message: 'this is a very long log m...', full_message: long_message, severity: 'INFO')
+        subject.info(long_message)
       end
     end
 
@@ -60,7 +69,7 @@ describe RailsGraylog::Logger do
       let(:data_hash) { { foo: 'bar' } }
 
       it 'calls the graylog notifier and composes a customized short and full message' do
-        expect(notifier).to receive(:notify!).with(data_hash.merge(short_message: "#{data_hash.to_s[0...25]}...",
+        expect(notifier).to receive(:notify!).with(data_hash.merge(short_message: "#{data_hash.to_s}",
                                                                    severity: 'INFO'))
         subject.info(data_hash)
       end
@@ -70,9 +79,10 @@ describe RailsGraylog::Logger do
       let(:message_with_field) { { message: Faker::Lorem.sentence, other_field: 'custom value' }}
 
       it 'calls the graylog notifier with the additional field' do
+        short_message = "#{message_with_field[:message].to_s[0...25]}..." if message_with_field[:message].size > 25
         expect(notifier).to receive(:notify!).with(
           message: message_with_field[:message], full_message: message_with_field[:message],
-          short_message: "#{message_with_field[:message].to_s[0...25]}...",
+          short_message: short_message || message_with_field[:message],
           other_field: 'custom value',
           severity: 'INFO')
 
