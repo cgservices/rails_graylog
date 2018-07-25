@@ -65,5 +65,19 @@ describe RailsGraylog::Logger do
         subject.info(data_hash)
       end
     end
+
+    context 'when logging hash data with message and an additional field' do
+      let(:message_with_field) { { message: Faker::Lorem.sentence, other_field: 'custom value' }}
+
+      it 'calls the graylog notifier with the additional field' do
+        expect(notifier).to receive(:notify!).with(
+          message: message_with_field[:message], full_message: message_with_field[:message],
+          short_message: "#{message_with_field[:message].to_s[0...25]}...",
+          other_field: 'custom value',
+          severity: 'INFO')
+
+        subject.info(message_with_field)
+      end
+    end
   end
 end
